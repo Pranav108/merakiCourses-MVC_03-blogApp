@@ -1,7 +1,9 @@
+require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
-const routes = require("./routes/courses.routes");
+const db = require("./config/db.config");
+// const routes = require("./routes/courses.routes");
 
 const app = express();
 
@@ -9,8 +11,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(morgan("dev"));
 
-app.use("/api/v1/", routes);
+// app.use("/api/v1/", routes);
+app.get("/api/v1/posts", async (req, res) => {
+  const posts = await db("post");
+  res.json({ posts });
+});
 
-app.listen(3002, () => {
-  console.log(`Server is listening on port 3002`);
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server is listening on port ${port}`);
 });
