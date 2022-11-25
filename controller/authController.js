@@ -1,5 +1,4 @@
 const bcrypt = require("bcryptjs");
-const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
 const User = require("../model/userModel");
 
@@ -63,7 +62,6 @@ exports.login = async (req, res, next) => {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
-  console.log(token);
   res.status(200).json({
     result: "success",
     token: signToken(user.id),
@@ -85,7 +83,6 @@ exports.protect = async (req, res, next) => {
     req.headers.authorization.startsWith("Bearer ")
   )
     token = req.headers.authorization.split(" ")[1];
-  console.log("token in protect:", token);
   if (token === "null")
     // best error
     return res.status(400).json({
@@ -107,6 +104,6 @@ exports.protect = async (req, res, next) => {
 
   //GRANT ACCESS TO PROTECTED ROUTE
 
-  req.user = currentUser; // will use this to getAllMyPosts
+  req.currentUser = currentUser; // will use this to getAllMyPosts
   next();
 };

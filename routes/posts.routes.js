@@ -10,7 +10,7 @@ router.get("/logout", authController.logout);
 router
   .route("/post")
   .get(postController.getAllPosts)
-  .post(postController.createPost);
+  .post(authController.protect, postController.createPost);
 
 //protect all routes after this middleware
 router.use(authController.protect);

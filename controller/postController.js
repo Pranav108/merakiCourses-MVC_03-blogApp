@@ -16,11 +16,15 @@ exports.getPostById = async (req, res) => {
 };
 
 exports.createPost = async (req, res) => {
-  const createdPost = await Post.create({ ...req.body });
+  const userEmail = req.currentUser[0].email;
+  const createdPost = await Post.create({
+    content: req.body.content,
+    created_by: userEmail,
+  });
+
   return res.json(createdPost);
 };
 
-// likepost
 exports.likePost = async (req, res) => {
   await Post.like(req.params.id);
   return res.json({
@@ -38,7 +42,8 @@ exports.dislikePost = async (req, res) => {
 };
 
 exports.getMyPosts = async (req, res) => {
-  const data = await Post.myPosts(req.user.email);
+  const userEmail = req.currentUser[0].email;
+  const data = await Post.myPosts(userEmail);
   return res.json({
     result: "success",
     length: data.length,
