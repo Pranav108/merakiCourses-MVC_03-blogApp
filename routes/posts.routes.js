@@ -17,9 +17,8 @@ router.use(authController.protect);
 
 router.route("/post/:id").get(postController.getPostById);
 
-// router.route("/post/like/:id").get(postController.likePostById);
-// router.route("/post/dislike/:id").get(postController.dislikePostById);
-
-// router.route("/mypost").get(postController.getMyPosts);
+router.route("/post/like/:id").get(postController.likePost);
+router.route("/post/dislike/:id").get(postController.dislikePost);
+router.route("/mypost").get(postController.getMyPosts);
 
 module.exports = router;

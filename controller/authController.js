@@ -59,7 +59,6 @@ exports.login = async (req, res, next) => {
     });
 
   // 4) if everything is ok, send toke to the client
-
   const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
@@ -107,6 +106,7 @@ exports.protect = async (req, res, next) => {
     });
 
   //GRANT ACCESS TO PROTECTED ROUTE
-  req.user = currentUser;
+
+  req.user = currentUser; // will use this to getAllMyPosts
   next();
 };

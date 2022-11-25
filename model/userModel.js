@@ -1,34 +1,12 @@
 const knex = require("../config/db.config");
 
-async function all() {
-  return knex("user");
-}
+exports.all = async () => knex("user");
 
-// will be removed later
-async function create(data) {
-  const results = await knex("user").insert(data).returning("*");
-  return results[0];
-}
+exports.create = async (data) => await knex("user").insert(data);
 
-async function get(id) {
-  const results = await knex("user").where({ id });
-  return results[0];
-}
+exports.get = async (id) => await knex("user").where({ id });
 
-async function getByEmail(email) {
-  const results = await knex("user").where({ email });
-  return results[0];
-}
+exports.getByEmail = async (email) => await knex("user").where({ email });
 
-async function removeByEmail(email) {
-  const results = await knex("user").where({ email }).del().returning("*");
-  return results[0];
-}
-
-module.exports = {
-  get,
-  all,
-  create,
-  getByEmail,
-  removeByEmail,
-};
+exports.removeByEmail = async (email) =>
+  await knex("user").where({ email }).del();

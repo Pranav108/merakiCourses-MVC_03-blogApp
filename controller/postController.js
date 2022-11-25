@@ -1,11 +1,11 @@
 const Post = require("../model/postModel");
 
-async function getAllPosts(req, res) {
+exports.getAllPosts = async (req, res) => {
   const data = await Post.all();
   return res.json(data);
-}
+};
 
-async function getPostById(req, res) {
+exports.getPostById = async (req, res) => {
   const post = await Post.get(req.params.id);
   return res.send(
     post || {
@@ -13,20 +13,35 @@ async function getPostById(req, res) {
       message: "Post with given ID doesn't exist",
     }
   );
-}
+};
 
-async function createPost(req, res) {
-  // validation JOI
+exports.createPost = async (req, res) => {
   const createdPost = await Post.create({ ...req.body });
   return res.json(createdPost);
-}
+};
 
 // likepost
-// dislikepost
-// getAllMyPost
+exports.likePost = async (req, res) => {
+  await Post.like(req.params.id);
+  return res.json({
+    result: "success",
+    message: "Post liked",
+  });
+};
 
-module.exports = {
-  getAllPosts,
-  getPostById,
-  createPost,
+exports.dislikePost = async (req, res) => {
+  await Post.dislike(req.params.id);
+  return res.json({
+    result: "success",
+    message: "Post disliked",
+  });
+};
+
+exports.getMyPosts = async (req, res) => {
+  const data = await Post.myPosts(req.user.email);
+  return res.json({
+    result: "success",
+    length: data.length,
+    data,
+  });
 };

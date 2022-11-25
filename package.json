@@ -4,10 +4,7 @@
   "description": "3rd project with MVC architecture",
   "main": "server.js",
   "scripts": {
-    "start_dev": "nodemon server.js",
-    "migrate": "knex migrate:latest",
-    "make": "knex migrate:make",
-    "seed:make": "knex seed:make"
+    "start_dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "pranav",
