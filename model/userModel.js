@@ -11,7 +11,7 @@ async function create(data) {
 }
 
 async function get(id) {
-  const results = await knex("users").where({ id });
+  const results = await knex("user").where({ id });
   return results[0];
 }
 

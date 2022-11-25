@@ -7,7 +7,12 @@ async function getAllPosts(req, res) {
 
 async function getPostById(req, res) {
   const post = await Post.get(req.params.id);
-  return res.send(post);
+  return res.send(
+    post || {
+      result: "failure",
+      message: "Post with given ID doesn't exist",
+    }
+  );
 }
 
 async function createPost(req, res) {

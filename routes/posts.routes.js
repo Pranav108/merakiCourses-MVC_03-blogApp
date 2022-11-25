@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post("/signup", authController.signup);
 router.post("/login", authController.login);
+router.get("/logout", authController.logout);
 
 router
   .route("/post")
@@ -12,9 +13,9 @@ router
   .post(postController.createPost);
 
 //protect all routes after this middleware
-// router.use(authController.protect);
+router.use(authController.protect);
 
-// router.route("/post/:id").get(postController.getPostById);
+router.route("/post/:id").get(postController.getPostById);
 
 // router.route("/post/like/:id").get(postController.likePostById);
 // router.route("/post/dislike/:id").get(postController.dislikePostById);
