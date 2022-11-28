@@ -31,7 +31,7 @@ A Blog App with express and My SQL database.
 
 ## ScreenShots
 
-<img src="/ScreenShots/Screenshot1.png" width="49%"/> <img src="/ScreenShots/Screenshot2.png" width="49%"/>
+<img src="/screenShots/Screenshot1.png" width="49%"/> <img src="/screenShots/Screenshot2.png" width="49%"/>
 
 ## Setting Up Your Local Environment
 
