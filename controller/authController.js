@@ -1,6 +1,28 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../model/userModel");
+const Joi = require("joi");
+
+// Add JOI
+const userSchema = Joi.object({
+  name: Joi.string().alphanum().min(3).max(20).required(),
+  password: Joi.string()
+    .pattern(new RegExp("^[a-zA-Z0-9]{5,10}$"))
+    .required()
+    .error(
+      () =>
+        new Error(
+          "password must be 5 to 10 character long and should be alphanumeric"
+        )
+    ),
+  email: Joi.string()
+    .required()
+    .email({
+      minDomainSegments: 2,
+      tlds: { allow: ["com", "in"] },
+    })
+    .error(() => new Error("Invalid Email")),
+}).unknown(false);
 
 const signToken = (id) =>
   jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -10,20 +32,30 @@ const signToken = (id) =>
 exports.signup = async (req, res, next) => {
   const user = await User.getByEmail(req.body.email);
   if (!user) {
-    const encryptedPassword = await bcrypt.hash(req.body.password, 12);
+    const { error, value } = userSchema.validate(req.body);
+    if (error)
+      return res.status(400).json({
+        result: "failure",
+        message: error.message,
+      });
+
+    const encryptedPassword = await bcrypt.hash(value.password, 12);
     const userData = {
-      name: req.body.name,
-      email: req.body.email,
+      name: value.name,
+      email: value.email,
       password: encryptedPassword,
     };
-    const newUserId = await User.create(userData);
-
+    const newUserId = await User.create(userData)[0];
     res.status(201).json({
       status: "success",
       message: "Account created Successfully ",
       token: signToken(newUserId),
       data: {
-        user: { id: newUserId, name: req.body.name, email: req.body.email },
+        user: {
+          id: newUserId,
+          name: value.name,
+          email: value.email,
+        },
       },
     });
   } else

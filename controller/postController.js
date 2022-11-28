@@ -1,4 +1,26 @@
 const Post = require("../model/postModel");
+const Joi = require("joi");
+
+// Add JOI
+const postSchema = Joi.object({
+  content: Joi.string()
+    .min(10)
+    .max(200)
+    .required()
+    .error(
+      () =>
+        new Error(
+          "Contenet should be less then 200 chars and more then 10 chars"
+        )
+    ),
+
+  created_by: Joi.string()
+    .email({
+      minDomainSegments: 2,
+      tlds: { allow: ["com", "in"] },
+    })
+    .error(() => new Error("Invalid Email")),
+}).unknown(false);
 
 exports.getAllPosts = async (req, res) => {
   const data = await Post.all();
@@ -16,13 +38,17 @@ exports.getPostById = async (req, res) => {
 };
 
 exports.createPost = async (req, res) => {
-  const userEmail = req.currentUser[0].email;
-  const createdPost = await Post.create({
+  const userEmail = req.currentUser.email;
+  const post = {
     content: req.body.content,
     created_by: userEmail,
-  });
+  };
+  const { error, value } = postSchema.validate(post);
+  if (error)
+    return res.status(400).json({ result: "failure", message: error.message });
 
-  return res.json(createdPost);
+  const [id] = await Post.create(post);
+  return res.json({ id, ...post });
 };
 
 exports.likePost = async (req, res) => {
@@ -42,7 +68,7 @@ exports.dislikePost = async (req, res) => {
 };
 
 exports.getMyPosts = async (req, res) => {
-  const userEmail = req.currentUser[0].email;
+  const userEmail = req.currentUser.email;
   const data = await Post.myPosts(userEmail);
   return res.json({
     result: "success",
