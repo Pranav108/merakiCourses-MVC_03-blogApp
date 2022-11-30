@@ -1,7 +1,6 @@
 const Post = require("../model/postModel");
 const Joi = require("joi");
 
-// Add JOI
 const postSchema = Joi.object({
   content: Joi.string()
     .min(10)
@@ -21,14 +20,13 @@ const postSchema = Joi.object({
     })
     .error(() => new Error("Invalid Email")),
 }).unknown(false);
-
 exports.getAllPosts = async (req, res) => {
-  const data = await Post.all();
+  const data = await Post.query();
   return res.json(data);
 };
 
 exports.getPostById = async (req, res) => {
-  const post = await Post.get(req.params.id);
+  const post = await Post.query().findById(req.params.id);
   return res.send(
     post || {
       result: "failure",
@@ -47,29 +45,43 @@ exports.createPost = async (req, res) => {
   if (error)
     return res.status(400).json({ result: "failure", message: error.message });
 
-  const [id] = await Post.create(post);
-  return res.json({ id, ...post });
+  const createdPost = await Post.query().insert(post);
+  return res.json(createdPost);
 };
 
 exports.likePost = async (req, res) => {
-  await Post.like(req.params.id);
+  const likedPost = await Post.query()
+    .findById(req.params.id)
+    .increment("like_count", 1);
+  if (likedPost)
+    return res.json({
+      result: "success",
+      message: "Post liked",
+    });
   return res.json({
-    result: "success",
-    message: "Post liked",
+    result: "failure",
+    message: "Post not found",
   });
 };
 
 exports.dislikePost = async (req, res) => {
-  await Post.dislike(req.params.id);
+  const dislikedPost = await Post.query()
+    .findById(req.params.id)
+    .increment("dislike_count", 1);
+  if (dislikedPost)
+    return res.json({
+      result: "success",
+      message: "Post disliked ",
+    });
   return res.json({
-    result: "success",
-    message: "Post disliked",
+    result: "failure",
+    message: "Post not found",
   });
 };
 
 exports.getMyPosts = async (req, res) => {
   const userEmail = req.currentUser.email;
-  const data = await Post.myPosts(userEmail);
+  const data = await Post.query().where("created_by", "=", userEmail);
   return res.json({
     result: "success",
     length: data.length,

@@ -1,13 +1,46 @@
-const knex = require("../config/db.config");
+const { Model } = require("objection");
+const Post = require("./postModel");
 
-exports.all = async () => knex("user");
+class User extends Model {
+  static get tableName() {
+    return "user";
+  }
 
-exports.create = async (data) => await knex("user").insert(data);
+  static get nameColumn() {
+    return "name";
+  }
 
-exports.get = async (id) => await knex("user").where({ id }).first();
+  static get emailColumn() {
+    return "email";
+  }
 
-exports.getByEmail = async (email) =>
-  await knex("user").where({ email }).first();
+  static get passwordColumn() {
+    return "password";
+  }
 
-exports.removeByEmail = async (email) =>
-  await knex("user").where({ email }).del();
+  static get jsonSchema() {
+    return {
+      type: "object",
+      required: ["name", "email", "password"],
+      properties: {
+        id: { type: "integer" },
+        name: { type: "string", minLength: 4, maxLength: 20 },
+        email: { type: "string" },
+        password: { type: "string" },
+      },
+    };
+  }
+
+  static relationMappings = {
+    children: {
+      relation: Model.HasManyRelation,
+      modelClass: Post,
+      join: {
+        from: "users.id",
+        to: "posts.created_by",
+      },
+    },
+  };
+}
+
+module.exports = User;

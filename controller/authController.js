@@ -1,9 +1,8 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const User = require("../model/userModel");
 const Joi = require("joi");
+const User = require("../model/userModel");
 
-// Add JOI
 const userSchema = Joi.object({
   name: Joi.string().alphanum().min(3).max(20).required(),
   password: Joi.string()
@@ -30,7 +29,7 @@ const signToken = (id) =>
   });
 
 exports.signup = async (req, res, next) => {
-  const user = await User.getByEmail(req.body.email);
+  const user = await User.query().where("email", "=", req.body.email).first();
   if (!user) {
     const { error, value } = userSchema.validate(req.body);
     if (error)
@@ -38,25 +37,18 @@ exports.signup = async (req, res, next) => {
         result: "failure",
         message: error.message,
       });
-
-    const encryptedPassword = await bcrypt.hash(value.password, 12);
+    const encryptedPassword = await bcrypt.hash(req.body.password, 12);
     const userData = {
-      name: value.name,
-      email: value.email,
+      name: req.body.name,
+      email: req.body.email,
       password: encryptedPassword,
     };
-    const newUserId = await User.create(userData)[0];
+    const newUser = await User.query().insert(userData);
     res.status(201).json({
       status: "success",
       message: "Account created Successfully ",
-      token: signToken(newUserId),
-      data: {
-        user: {
-          id: newUserId,
-          name: value.name,
-          email: value.email,
-        },
-      },
+      token: signToken(newUser.id),
+      data: newUser,
     });
   } else
     return res
@@ -75,7 +67,7 @@ exports.login = async (req, res, next) => {
     });
 
   // 2) check if user exist and password is correct
-  const user = await User.getByEmail(email);
+  const user = await User.query().where("email", "=", email).first();
   if (!user)
     return res
       .status(400)
@@ -90,10 +82,6 @@ exports.login = async (req, res, next) => {
     });
 
   // 4) if everything is ok, send toke to the client
-  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
-  });
-
   res.status(200).json({
     result: "success",
     token: signToken(user.id),
@@ -127,11 +115,12 @@ exports.protect = async (req, res, next) => {
   const decodedInfo = jwt.verify(token, process.env.JWT_SECRET);
 
   //3)Check if user still exists
-  const currentUser = await User.get(decodedInfo.id);
+  const currentUser = await User.query().findById(decodedInfo.id).first();
   if (!currentUser)
     res.status(400).json({
       result: "failure",
-      message: "The user belonging to this token no longer exists.",
+      message:
+        "The user belonging to this token no longer exists. Please login again",
     });
 
   //GRANT ACCESS TO PROTECTED ROUTE

@@ -1,18 +1,39 @@
-const knex = require("../config/db.config");
+const { Model } = require("objection");
 
-exports.all = async () => knex("post");
+class Post extends Model {
+  static get tableName() {
+    return "post";
+  }
 
-exports.get = async (id) => await knex("post").where({ id });
+  static get totalLikesColumn() {
+    return "like_count";
+  }
 
-exports.remove = async (id) => await knex("post").where({ id }).del();
+  static get totalDislikesColumn() {
+    return "dislike_count";
+  }
 
-exports.create = async (data) => await knex("post").insert(data);
+  static get userIdColumn() {
+    return "created_by";
+  }
 
-exports.like = async (id) =>
-  await knex("post").where({ id }).increment("like_count", 1);
+  static get contentColumn() {
+    return "content";
+  }
 
-exports.dislike = async (id) =>
-  await knex("post").where({ id }).increment("dislike_count", 1);
+  static get jsonSchema() {
+    return {
+      type: "object",
+      required: ["created_by", "content"],
+      properties: {
+        id: { type: "integer" },
+        content: { type: "string" },
+        created_by: { type: "string" },
+        like_count: { type: "number", default: 10 },
+        dislike_count: { type: "number", default: 0 },
+      },
+    };
+  }
+}
 
-exports.myPosts = async (created_by) =>
-  await knex("post").where({ created_by });
+module.exports = Post;

@@ -18,6 +18,8 @@ A Blog App with express and My SQL database.
 - Using the MVC (Model-View-Controller) architecture
 - Database operations (SQL)
 - JWT for authentication
+- JOI for schema description language and data validation
+- Knex to build SQL query
 
 ## Tech stacks
 
@@ -26,8 +28,8 @@ A Blog App with express and My SQL database.
 - SQL - Local Database
 - JSON Web Token - Security Token
 - Postman - API testing
-- Knex - SQL query builder
 - Git - Version control system
+- Objection.js - An SQL-friendly ORM for Node.js
 
 ## ScreenShots
 

@@ -1,11 +1,11 @@
 const User = require("../model/userModel");
 
 exports.getAllUsers = async (req, res) => {
-  const all = await User.all();
-  return res.json(all);
+  const allUsers = await User.query();
+  return res.json(allUsers);
 };
 
 exports.getUser = async (req, res) => {
-  const user = await User.get(req.params.id);
+  const user = await User.query().findById(req.params.id);
   return res.send(user);
 };
