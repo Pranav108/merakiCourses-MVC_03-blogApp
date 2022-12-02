@@ -24,6 +24,7 @@ A Blog App with express and My SQL database.
 - NodeJS - JS runtime environment
 - Express - The web framework used
 - SQL - Local Database
+- PostgreSQL - object-relational database
 - JSON Web Token - Security Token
 - Postman - API testing
 - Knex - SQL query builder
@@ -64,7 +65,6 @@ Helpful commands
 $ git clone https://github.com/yourGitHubUsername/merakiCourses-MVC_03-blogApp
 $ cd merakiCourses-MVC_03-blogApp
 $ npm install
-$ knex migrate:make migration_name
 $ knex migrate:latest
 $ knex seed:run
 $ npm run start_dev

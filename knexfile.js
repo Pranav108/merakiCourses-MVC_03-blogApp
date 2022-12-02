@@ -7,7 +7,8 @@ require("dotenv").config(); // need to do because it is not on the top of server
  */
 module.exports = {
   development: {
-    client: "mysql",
+    // client: "mysql",
+    client: "pg",
     connection: {
       host: "localhost",
       user: process.env.DB_USER,

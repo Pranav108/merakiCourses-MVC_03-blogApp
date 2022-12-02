@@ -5,7 +5,7 @@
 exports.up = (knex) =>
   knex.schema.createTable("user", (tbl) => {
     tbl.increments("id");
-    tbl.string("email").index();
+    tbl.string("email").unique().index();
     tbl.string("name").notNullable();
     tbl.string("password").notNullable();
   });
